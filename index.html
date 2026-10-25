@@ -1,0 +1,539 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Khảo sát Nevo Hè 2027</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@1,600;1,700&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: sticky brand bar with three views; form is a single narrow column of question cards, summary is a wider grid of result blocks. */
+:root{
+  --bg:#f7f6f5; --surface:#ffffff; --surface-2:#f1efee; --fg:#1b1717; --muted:#6b6566; --line:#e3dfde;
+  --accent:#dc0019; --accent-ink:#ffffff; --accent-soft:#fde8ea; --deep:#820014; --ok:#1d7a46; --ok-soft:#e3f3ea; --warn:#9a5b00; --warn-soft:#fbf0dc;
+  --bar:#dc0019; --bar-bg:#efe9e8;
+  --f-display:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
+  --f-body:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#141112; --surface:#1e1a1b; --surface-2:#262122; --fg:#f1eded; --muted:#a59c9d; --line:#352e2f;
+  --accent:#ff3347; --accent-ink:#1a0003; --accent-soft:#3a1519; --deep:#ff8a94; --ok:#4cc27f; --ok-soft:#163223; --warn:#e8a94a; --warn-soft:#33260f;
+  --bar:#ff4d5f; --bar-bg:#2f2829; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#141112; --surface:#1e1a1b; --surface-2:#262122; --fg:#f1eded; --muted:#a59c9d; --line:#352e2f;
+  --accent:#ff3347; --accent-ink:#1a0003; --accent-soft:#3a1519; --deep:#ff8a94; --ok:#4cc27f; --ok-soft:#163223; --warn:#e8a94a; --warn-soft:#33260f;
+  --bar:#ff4d5f; --bar-bg:#2f2829; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.5}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+.wrap{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--surface);border-bottom:1px solid var(--line)}
+.bar{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding-block:10px}
+.brand{font-family:var(--f-display);font-style:italic;font-weight:700;font-size:26px;letter-spacing:.02em;color:var(--accent);line-height:1}
+.brand small{display:block;font-family:var(--f-body);font-style:normal;font-weight:500;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:3px}
+nav{display:flex;gap:4px;margin-left:auto;flex-wrap:wrap}
+@media (max-width:560px){nav{margin-left:0;width:100%;flex-wrap:nowrap}nav a{flex:1;text-align:center;padding:8px 6px!important;font-size:13px!important}}
+nav a{text-decoration:none;color:var(--fg);font-weight:600;font-size:14px;padding:8px 12px;border-radius:8px;border:1px solid transparent}
+nav a:hover{background:var(--surface-2)}
+nav a[aria-current="page"]{background:var(--accent);color:var(--accent-ink)}
+nav a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+main{max-width:1100px;margin:0 auto;padding-block:20px 80px}
+.form-col{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+h1,h2{font-family:var(--f-display);font-style:italic;font-weight:700;letter-spacing:.01em;text-wrap:balance;margin:0;line-height:1.05}
+h1{font-size:34px}
+h2{font-size:24px;color:var(--deep)}
+.lead{color:var(--muted);margin:6px 0 0;max-width:62ch}
+.intro{display:flex;flex-direction:column;gap:4px;padding-block:4px 6px}
+.status{font-size:13px;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;background:var(--surface-2);font-weight:600;font-size:12px;color:var(--fg)}
+.pill.ok{background:var(--ok-soft);color:var(--ok)} .pill.warn{background:var(--warn-soft);color:var(--warn)} .pill.red{background:var(--accent-soft);color:var(--deep)}
+.sec-title{display:flex;align-items:baseline;gap:10px;margin-top:14px}
+.sec-title .tag{font-size:12px;color:var(--muted)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.card.meta{border-color:var(--accent)}
+.q-label{font-weight:600;font-size:15.5px;display:flex;gap:8px;align-items:baseline}
+.q-id{font-family:var(--f-display);font-style:italic;font-weight:700;color:var(--accent);font-size:17px;flex:none}
+.q-note{font-size:12.5px;color:var(--muted);font-weight:500}
+.req{color:var(--accent)}
+.hint{font-size:13px;background:var(--surface-2);border-radius:8px;padding:8px 10px;color:var(--fg)}
+.hint b{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--deep);margin-right:6px}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opt{font:inherit;font-size:14px;padding:8px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer;text-align:left;line-height:1.3}
+.opt:hover{border-color:var(--muted)}
+.opt[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
+.opt[disabled]{opacity:.4;cursor:not-allowed}
+input[type=text],input[type=tel],select,textarea{font:inherit;font-size:15px;width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--fg)}
+textarea{min-height:84px;resize:vertical}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:560px){.row2{grid-template-columns:1fr}}
+label.chk{display:flex;gap:10px;align-items:flex-start;font-size:14px;cursor:pointer}
+label.chk input{width:20px;height:20px;margin-top:1px;accent-color:var(--accent);flex:none}
+.rank{display:flex;flex-direction:column;gap:6px}
+.rank-row{display:flex;align-items:center;gap:10px;justify-content:space-between;border-bottom:1px solid var(--line);padding-block:6px}
+.rank-row span{min-width:0}
+.rank-btns{display:flex;gap:4px;flex:none}
+.rank-btns .opt{width:36px;height:36px;padding:0;text-align:center;border-radius:8px}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13.5px;font-variant-numeric:tabular-nums}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
+th{font-size:12px;color:var(--muted);font-weight:600}
+td.c,th.c{text-align:center}
+.grid-q .opt{width:30px;height:30px;padding:0;border-radius:50%}
+.actions{position:sticky;bottom:0;background:var(--bg);padding-block:12px calc(12px + env(safe-area-inset-bottom,0px));display:flex;gap:10px;align-items:center;flex-wrap:wrap;border-top:1px solid var(--line)}
+.btn{font:inherit;font-weight:600;font-size:15px;padding:12px 20px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.small{font-size:13px;padding:7px 12px;border-radius:8px}
+.btn.danger{color:var(--accent);border-color:var(--accent)}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+.msg{font-size:14px}
+.msg.err{color:var(--accent)} .msg.ok{color:var(--ok)}
+.miss{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+/* summary */
+.sum-head{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;justify-content:space-between}
+.filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.filters select{width:auto}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:16px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.kpi .k{font-size:12px;color:var(--muted);font-weight:600}
+.kpi .v{font-family:var(--f-display);font-style:italic;font-weight:700;font-size:30px;line-height:1.1;font-variant-numeric:tabular-nums}
+.kpi .v small{font-size:16px;color:var(--muted)}
+.prog{height:6px;background:var(--bar-bg);border-radius:3px;margin-top:6px;overflow:hidden}
+.prog i{display:block;height:100%;background:var(--accent)}
+.res-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));gap:12px;margin-top:12px}
+.res-grid .card.wide{grid-column:1/-1}
+.dec{display:flex;gap:4px;flex-wrap:wrap}
+.dec span{font-size:11px;font-weight:600;padding:2px 7px;border-radius:5px;background:var(--surface-2);color:var(--muted)}
+.bars{display:flex;flex-direction:column;gap:6px}
+.b{display:grid;grid-template-columns:minmax(0,1fr) 72px;gap:8px;align-items:center;font-size:13px}
+.b .t{min-width:0}
+.b .t div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.b .track{height:8px;background:var(--bar-bg);border-radius:4px;overflow:hidden;margin-top:3px}
+.b .track i{display:block;height:100%;background:var(--bar);border-radius:4px}
+.b .n{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+.b .n small{color:var(--muted);font-weight:500}
+.base{font-size:12px;color:var(--muted)}
+.quotes{display:flex;flex-direction:column;gap:8px;max-height:360px;overflow:auto}
+.quote{border-left:2px solid var(--line);padding:2px 0 2px 10px;font-size:13.5px}
+.quote .who{font-size:11.5px;color:var(--muted);margin-top:2px}
+.empty{padding:28px;text-align:center;color:var(--muted);background:var(--surface);border:1px dashed var(--line);border-radius:12px;margin-top:16px}
+.hl{background:var(--accent-soft);font-weight:700}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:10px;font-weight:600;font-size:14px;z-index:20;max-width:calc(100% - 32px)}
+@media (prefers-reduced-motion:no-preference){.opt,.btn{transition:background .12s,border-color .12s}}
+</style>
+</head>
+<body>
+
+<header class="wrap"><div class="bar">
+  <div class="brand">NEVO<small>Khảo sát khách hàng · Hè 2027</small></div>
+  <nav aria-label="Chế độ">
+    <a href="#offline" data-view="offline">Phỏng vấn offline</a>
+    <a href="#online" data-view="online">Phỏng vấn online</a>
+    <a href="#tonghop" data-view="tonghop">Tổng hợp</a>
+  </nav>
+</div></header>
+
+<main class="wrap">
+  <section id="view-form" class="form-col">
+    <div class="intro">
+      <h1 id="f-title">Phiếu phỏng vấn offline</h1>
+      <p class="lead" id="f-lead"></p>
+      <div class="status" id="f-status"></div>
+    </div>
+    <div id="form-body" class="form-col"></div>
+    <div class="actions">
+      <button class="btn primary" id="btn-submit" type="button">Lưu phiếu</button>
+      <button class="btn" id="btn-clear" type="button">Xóa nội dung đang nhập</button>
+      <span class="msg" id="f-msg" role="status"></span>
+    </div>
+  </section>
+
+  <section id="view-sum" hidden>
+    <div class="sum-head">
+      <div>
+        <h1>Tổng hợp câu trả lời</h1>
+        <p class="lead">Phiếu lưu ngay trên trình duyệt của máy này. Cuối mỗi ngày bấm “Tải file dữ liệu” để sao lưu; người tổng hợp bấm “Gộp dữ liệu” để gộp file của các máy. Tỷ lệ tính trên số người đã trả lời câu đó.</p>
+      </div>
+      <div class="filters">
+        <select id="flt-mon" aria-label="Lọc theo môn"><option value="">Tất cả môn</option><option>Chạy bộ</option><option>Pickleball</option><option>Cả hai</option></select>
+        <select id="flt-kenh" aria-label="Lọc theo kênh"><option value="">Online + offline</option><option value="online">Online</option><option value="offline">Offline</option></select>
+        <select id="flt-dec" aria-label="Lọc theo quyết định"><option value="">Mọi quyết định</option><option value="SP">Sản phẩm</option><option value="MKT">Chương trình MKT</option><option value="VIS">Visual</option><option value="CON">Content</option></select>
+        <button class="btn small" id="btn-csv" type="button">Tải CSV (Excel)</button>
+        <button class="btn small" id="btn-json" type="button">Tải file dữ liệu</button>
+        <label class="btn small" for="f-import" style="display:inline-flex;align-items:center">Gộp dữ liệu</label><input type="file" id="f-import" accept=".json,application/json" hidden>
+        <button class="btn small" id="btn-contacts" type="button" hidden>Tải danh sách liên hệ</button>
+      </div>
+    </div>
+    <div id="sum-body"></div>
+  </section>
+</main>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(function(){
+"use strict";
+const C1 = ["Hà Nội","TP. Hồ Chí Minh","Hải Phòng","Đà Nẵng","Cần Thơ","Huế"];
+const C2 = ["An Giang","Bắc Ninh","Cà Mau","Cao Bằng","Đắk Lắk","Điện Biên","Đồng Nai","Đồng Tháp","Gia Lai","Hà Tĩnh","Hưng Yên","Khánh Hòa","Lai Châu","Lâm Đồng","Lạng Sơn","Lào Cai","Nghệ An","Ninh Bình","Phú Thọ","Quảng Ngãi","Quảng Ninh","Quảng Trị","Sơn La","Tây Ninh","Thái Nguyên","Thanh Hóa","Tuyên Quang","Vĩnh Long"];
+const NB = a => a.B1==="Chưa chắc" || a.B1==="Không mua";
+const BUY = a => !NB(a);
+const SECTIONS = {A:"Phần A · Thông tin cá nhân",B:"Phần B · Nhu cầu mua đồ thể thao mùa hè",C:"Phần C · Dịp sử dụng",D:"Phần D · Lý do chọn sản phẩm",E:"Phần E · Trải nghiệm mua sắm và nội dung"};
+const C1_OPTS = ["Chạy bộ hằng ngày","Tham gia giải chạy (5K, 10K, 21K, 42K)","Chơi pickleball","Cầu lông, tennis","Đi tập gym, yoga","Đi du lịch, đi biển, leo núi","Team building, sự kiện công ty","Mặc hằng ngày, đi chơi, đi cà phê","Mặc đi làm","Mặc ở nhà","Mua làm quà tặng"];
+const Q = [
+ {id:"A1",s:"A",t:"single",l:"Giới tính",req:1,o:["Nam","Nữ","Khác / Không muốn trả lời"],d:["SP"]},
+ {id:"A2",s:"A",t:"single",l:"Độ tuổi",req:1,o:["20–22","23–24","25–27","28–30"],d:["SP","CON"]},
+ {id:"A3",s:"A",t:"single",l:"Thu nhập cá nhân mỗi tháng (VNĐ)",o:["Dưới 7.000.000","7.000.000 – dưới 10.000.000","10.000.000 – dưới 15.000.000","15.000.000 – dưới 25.000.000","25.000.000 – dưới 40.000.000","Từ 40.000.000 trở lên","Không muốn trả lời"],d:["SP","MKT"]},
+ {id:"A4",s:"A",t:"province",l:"Tỉnh, thành đang sống",req:1,d:["MKT","VIS"]},
+ {id:"A5",s:"A",t:"single",l:"Công việc hiện tại",o:["Sinh viên","Nhân viên văn phòng","Quản lý, trưởng nhóm","Tự kinh doanh, freelancer","Lao động kỹ thuật, dịch vụ"],other:1,d:["CON"]},
+ {id:"A6",s:"A",t:"single",l:"Đang chạy bộ hay chơi pickleball?",req:1,o:["Chạy bộ","Pickleball","Cả hai"],d:["SP","MKT","VIS","CON"]},
+ {id:"A7",s:"A",t:"single",l:"Tần suất tập luyện",o:["Dưới 1 lần/tuần","1–2 lần/tuần","3–4 lần/tuần","Từ 5 lần/tuần trở lên"],d:["SP","MKT"]},
+ {id:"A8",s:"A",t:"multi",max:3,l:"Vì sao bắt đầu và duy trì môn này?",note:"tối đa 3",o:["Khỏe hơn, có năng lượng","Giảm cân, giữ dáng","Giải tỏa căng thẳng sau giờ làm","Gặp gỡ, kết bạn, hẹn hò","Chinh phục mục tiêu (cự ly, giải đấu, thứ hạng)","Theo xu hướng, bạn bè rủ","Thể hiện bản thân, chia sẻ lên mạng xã hội"],other:1,d:["CON","MKT"],
+   hOff:"Còn nhớ buổi đầu tiên không? Điều gì khiến bạn quay lại lần thứ hai?",note2:"A8n"},
+ {id:"A8n",s:"A",t:"text",l:"Ghi thêm lời kể của khách (A8)",short:1,d:["CON"],sub:1},
+ {id:"B1",s:"B",t:"single",l:"Mùa hè năm sau (tháng 4–8/2027) có nhu cầu mua sản phẩm thể thao không?",req:1,o:["Chắc chắn sẽ mua","Có thể sẽ mua","Chưa chắc","Không mua"],d:["SP","MKT"]},
+ {id:"B1a",s:"B",t:"multi",l:"Vì sao chưa có ý định mua?",note:"chọn nhiều",o:["Đồ cũ còn dùng được","Ít tập vào mùa hè vì nóng","Chưa thấy sản phẩm phù hợp","Giá cao so với ngân sách","Mặc đồ thường để tập cũng được"],other:1,c:NB,d:["SP","MKT"]},
+ {id:"B2",s:"B",t:"multi",l:"Dự định mua những sản phẩm nào?",note:"chọn nhiều",o:["Áo phông thể thao","Áo polo thể thao","Áo ba lỗ, tank top","Áo bra thể thao","Quần shorts","Váy, chân váy thể thao (skort)","Quần legging, quần bó","Áo khoác chống nắng, chống UV","Giày chạy bộ","Giày pickleball, tennis","Tất, mũ, băng đô, túi"],other:1,c:BUY,d:["SP"]},
+ {id:"B3",s:"B",t:"single",l:"Tổng số tiền dự kiến chi cả mùa hè (VNĐ)",o:["Dưới 500.000","500.000 – dưới 1.000.000","1.000.000 – dưới 2.000.000","2.000.000 – dưới 3.000.000","Từ 3.000.000 trở lên"],c:BUY,d:["SP","MKT"]},
+ {id:"B4",s:"B",t:"grid",l:"Mức giá hợp lý cho từng món (VNĐ)",note:"chỉ điền món khách định mua",rows:["Áo (phông, polo, tank top)","Quần shorts, váy thể thao","Áo bra, legging","Áo khoác chống nắng","Giày"],cols:["<200k","200–350k","350–500k","500k–1tr","≥1tr"],c:BUY,d:["SP"]},
+ {id:"B5",s:"B",t:"multi",l:"Thường mua đồ thể thao ở đâu?",note:"chọn nhiều",o:["Cửa hàng của thương hiệu","Shopee, Lazada, TikTok Shop","Website, app của thương hiệu","Livestream, Facebook, Zalo","Shop ở sân tập, CLB, giải chạy"],other:1,c:BUY,d:["MKT","VIS"]},
+ {id:"B6",s:"B",t:"multi",l:"Đang dùng đồ thể thao của thương hiệu nào?",note:"chọn nhiều",o:["Nevo","Coolmate","Nike","Adidas","Decathlon","Uniqlo","Li-Ning","Biti's","Không nhớ thương hiệu"],other:1,d:["MKT"]},
+ {id:"B7",s:"B",t:"single",l:"Đã biết đến Nevo chưa?",o:["Đã mua và dùng","Biết nhưng chưa mua","Chưa biết"],d:["MKT"]},
+ {id:"B8",s:"B",t:"multi",max:3,l:"Muốn sản phẩm có thêm tính năng nào?",note:"tối đa 3",o:["Túi đựng điện thoại, chìa khóa chắc, không nảy khi chạy","Túi đựng bóng pickleball","Quần, váy có lớp lót trong","Vải không lộ vết mồ hôi","Chống UV, làm mát khi tập ngoài nắng","Phản quang khi chạy tối, sáng sớm","Kháng khuẩn, khử mùi","Giày bám sân, đỡ cổ chân khi di chuyển ngang"],other:1,c:BUY,d:["SP"]},
+ {id:"B9",s:"B",t:"group",l:"Phong cách thích cho đồ thể thao",parts:[["mau","Màu",["Trung tính (đen, trắng, xám, be)","Pastel","Màu nổi, neon","Phối nhiều màu"]],["form","Form",["Ôm sát","Vừa người","Rộng, oversize"]],["pc","Phong cách",["Chuyên nghiệp, kỹ thuật","Tối giản","Thời trang, mặc đi chơi được","Trẻ trung, năng động"]]],c:BUY,d:["SP","VIS"]},
+ {id:"B10",s:"B",t:"multi",l:"Thường mua vào thời điểm nào?",note:"chọn nhiều",o:["Đầu mùa hè, khi trời bắt đầu nóng","Trước giải chạy, giải đấu","Khi bắt đầu môn mới hoặc mục tiêu mới","Ngày đôi, ngày sale (6.6, 7.7…)","Sau khi nhận lương","Khi đồ cũ hỏng","Khi thấy bạn bè, KOL mặc"],c:BUY,d:["MKT"]},
+ {id:"B11",s:"B",t:"multi",max:2,l:"Ưu đãi nào khiến mua nhanh nhất?",note:"tối đa 2",o:["Giảm giá trực tiếp theo %","Mua combo, mua 2 giảm thêm","Tặng kèm phụ kiện","Thành viên CLB được giá riêng","Đổi điểm tích lũy (km chạy, số trận) lấy quà","Đổi trả miễn phí, không hài lòng hoàn tiền"],other:1,c:BUY,d:["MKT"]},
+ {id:"C1",s:"C",t:"multi",l:"Mua đồ thể thao mùa hè cho những dịp nào?",note:"chọn nhiều",o:C1_OPTS,other:1,c:BUY,d:["SP","CON"]},
+ {id:"C2",s:"C",t:"single",l:"Dịp QUAN TRỌNG NHẤT khiến bạn mua?",note:"chọn trong các dịp ở C1",dyn:"C1",c:BUY,d:["SP","CON"]},
+ {id:"C3",s:"C",t:"single",l:"Với dịp đó, thường tập vào khung giờ nào?",o:["Sáng sớm (trước 7h)","Ban ngày (7h–17h)","Chiều tối (17h–20h)","Tối muộn (sau 20h)"],c:BUY,d:["SP","CON"]},
+ {id:"C4",s:"C",t:"single",l:"Thường tập ở đâu?",o:["Ngoài trời","Trong nhà","Cả hai"],c:BUY,d:["SP"]},
+ {id:"C5",s:"C",t:"single",l:"Thường tập một mình hay cùng người khác?",o:["Một mình","Với bạn bè, người yêu","Với CLB, cộng đồng","Với đồng nghiệp"],c:BUY,d:["MKT","CON"]},
+ {id:"C6",s:"C",t:"single",l:"Có hay chụp ảnh, quay video, đăng mạng xã hội khi tập không?",o:["Gần như lần nào cũng có","Thỉnh thoảng","Hiếm khi hoặc không"],c:BUY,d:["VIS","CON"]},
+ {id:"D1",s:"D",t:"rank",l:"Vì sao muốn dùng sản phẩm đó? Chọn 3 lý do và xếp hạng 1, 2, 3",o:["Thoáng mát, thấm hút mồ hôi, nhanh khô","Chống nắng, chống tia UV","Co giãn, dễ vận động","Nhẹ, không bám dính khi ra mồ hôi","Không hôi, kháng khuẩn","Form đẹp, tôn dáng","Màu sắc, thiết kế đẹp để chụp ảnh","Mặc được cả khi tập và đi chơi, đi làm","Bền, không xù, không bai sau giặt","Giá hợp lý, nhiều khuyến mãi","Thương hiệu uy tín, có phong cách","Bạn bè, nhóm tập đều dùng","Người nổi tiếng, KOL giới thiệu"],c:BUY,d:["SP","CON"]},
+ {id:"D2",s:"D",t:"text",l:"Với lý do hạng 1, vì sao điều đó quan trọng với bạn?",hOff:"“Nếu thiếu điều đó thì bạn gặp chuyện gì?” → “Chuyện đó ảnh hưởng thế nào đến buổi tập hay cảm giác của bạn?” Hỏi “vì sao” tối đa 3 lần. Ghi nguyên văn.",hOn:"Nhắn thêm một câu “vì sao” nếu khách trả lời quá ngắn.",c:BUY,d:["CON","SP"]},
+ {id:"D3",s:"D",t:"text",l:"Kể về lần gần nhất mua đồ thể thao: mua gì, ở đâu, giá bao nhiêu, vì sao chọn món đó?",c:BUY,d:["SP","MKT","VIS"]},
+ {id:"D4",s:"D",t:"text",l:"Điều khó chịu nhất với đồ thể thao khi mặc vào mùa hè là gì?",hOff:"Gợi ý: nóng, bí, dính mồ hôi, lộ vết mồ hôi, hôi, cháy nắng, quần ngắn hoặc bó, bai, xù, bạc màu. Hỏi thêm: “Bạn đang xử lý chuyện đó thế nào?”",d:["SP","CON"]},
+ {id:"D5",s:"D",t:"text",l:"Điều gì sẽ khiến bạn chuyển từ thương hiệu đang dùng sang thương hiệu khác?",d:["MKT","SP"]},
+ {id:"D6",s:"D",t:"multi",max:3,l:"Muốn tham gia hoạt động nào nếu thương hiệu tổ chức?",note:"tối đa 3",o:["Buổi tập nhóm hằng tuần có huấn luyện viên","Giải giao lưu, giải phong trào","Thử thách online (đủ km, đủ trận) nhận quà","Buổi hướng dẫn kỹ thuật cho người mới","Ngày dùng thử sản phẩm tại sân, công viên","Sự kiện kết hợp âm nhạc, cà phê, giao lưu","Không quan tâm"],d:["MKT"]},
+ {id:"E1",s:"E",t:"multi",max:3,l:"Tại cửa hàng, điều gì giúp bạn quyết định mua nhanh hơn?",note:"tối đa 3",o:["Hàng xếp theo môn (khu chạy bộ, khu pickleball)","Ma-nơ-canh mặc sẵn cả bộ phối đồ","Biển thông tin nói rõ tính năng","Được chạm vải, xem thử nghiệm thấm nước tại chỗ","Phòng thử rộng, có gương, có khoảng thử vận động","Nhân viên hiểu môn, tư vấn đúng nhu cầu","Giá và ưu đãi hiển thị rõ","Ảnh, video người thật đang chơi trên màn hình, poster"],d:["VIS"]},
+ {id:"E2",s:"E",t:"multi",max:3,l:"Khi mua online, điều gì khiến bạn bấm mua?",note:"tối đa 3",o:["Ảnh người mẫu đang vận động thật","Video thử nghiệm (thấm mồ hôi, co giãn, giặt máy)","Review có ảnh, video của người mua","Bảng size chi tiết, có chiều cao cân nặng người mẫu","Livestream thử đồ trực tiếp","Gợi ý phối cả bộ","Chính sách đổi size, đổi trả dễ"],d:["VIS"]},
+ {id:"E2n",s:"E",t:"text",l:"Lần gần nhất định mua rồi lại thôi, lý do là gì?",d:["VIS","MKT"]},
+ {id:"E3",s:"E",t:"multi",l:"Hay xem nội dung về chạy bộ, pickleball ở đâu?",note:"chọn nhiều",o:["TikTok","Facebook (trang, nhóm)","Instagram","YouTube","Threads","Strava","Nhóm Zalo, Messenger"],other:1,d:["CON"]},
+ {id:"E4",s:"E",t:"multi",max:3,l:"Thích xem loại nội dung nào nhất?",note:"tối đa 3",o:["Hướng dẫn kỹ thuật, bài tập","Review, so sánh đồ và giày","Câu chuyện người thật","Video vui, bắt trend, meme","Thử thách, cuộc thi có quà","Outfit, phối đồ khi đi tập","Tin giải đấu, lịch sự kiện"],d:["CON"]},
+ {id:"E5",s:"E",t:"text",l:"Đang theo dõi người, trang hoặc CLB nào về chạy bộ, pickleball? Vì sao thích họ?",d:["CON","MKT"]}
+];
+const QMAP = Object.fromEntries(Q.map(q=>[q.id,q]));
+const DEC = {SP:"Sản phẩm",MKT:"MKT",VIS:"Visual",CON:"Content"};
+const META = {
+  offline:{title:"Phiếu phỏng vấn offline",lead:"Dùng khi gặp trực tiếp tại cửa hàng, sân pickleball, công viên hoặc giải chạy. Đọc câu hỏi, chạm vào đáp án, ghi nguyên văn ở các câu tự do. Khoảng 15–20 phút."},
+  online:{title:"Phiếu phỏng vấn online",lead:"Dùng khi hỏi khách qua Zalo, Messenger hoặc điện thoại. Hỏi lần lượt theo phiếu rồi nhập ngay vào đây. Khoảng 10 phút."}
+};
+const PLACE_OFF = ["Cửa hàng Nevo","Sân pickleball","Công viên, đường chạy","Giải chạy, giải đấu","Khác"];
+const PLACE_ON = ["Zalo","Messenger","Gọi điện","Khác"];
+
+const $ = s=>document.querySelector(s);
+const el = (tag, attrs, ...kids)=>{const e=document.createElement(tag); if(attrs) for(const k in attrs){ if(k==="class") e.className=attrs[k]; else if(k==="text") e.textContent=attrs[k]; else if(k.startsWith("on")) e.addEventListener(k.slice(2),attrs[k]); else if(attrs[k]!==undefined&&attrs[k]!==null&&attrs[k]!==false) e.setAttribute(k,attrs[k]===true?"":attrs[k]); } for(const k of kids){ if(k==null) continue; e.append(k.nodeType?k:document.createTextNode(k)); } return e; };
+
+let view = "offline";
+const store = {offline:blank(),online:blank()};
+function blank(){return {a:{},m:{consent:false,place:"",placeName:"",contactOk:false,phone:""}};}
+try{ const s=JSON.parse(localStorage.getItem("nevo-ks-draft")||"null"); if(s&&s.offline&&s.online){store.offline=s.offline;store.online=s.online;} }catch(e){}
+let saveT=null;
+function saveDraft(){ clearTimeout(saveT); saveT=setTimeout(()=>{ try{localStorage.setItem("nevo-ks-draft",JSON.stringify(store));}catch(e){} },400); }
+
+let db=null, user=null, dl=null, myId=null, isEditor=false, responses=[], subscribed=false, profiles={};
+
+function toast(t){ const x=$("#toast"); x.textContent=t; x.hidden=false; clearTimeout(toast.t); toast.t=setTimeout(()=>{x.hidden=true;},2600); }
+function tier(p){ return C1.includes(p)?"Cấp 1":(C2.includes(p)?"Cấp 2":""); }
+function fmtTime(iso){ try{ return new Intl.DateTimeFormat("vi-VN",{timeZone:"Asia/Ho_Chi_Minh",day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit",hour12:false}).format(new Date(iso)); }catch(e){ return iso; } }
+function visible(q,a){ return !q.c || q.c(a); }
+
+/* ---------- FORM ---------- */
+function renderForm(){
+  const st = store[view], a = st.a, m = st.m;
+  $("#f-title").textContent = META[view].title;
+  $("#f-lead").textContent = META[view].lead;
+  const body = $("#form-body"); body.replaceChildren();
+  // meta card
+  const meta = el("div",{class:"card meta"});
+  meta.append(el("div",{class:"q-label"},el("span",{class:"q-id",text:"0"}),"Mở đầu và đồng ý tham gia ",el("span",{class:"req",text:"*"})));
+  meta.append(el("div",{class:"hint"},el("b",{text:"Đọc cho khách"}),"Chào bạn, mình là nhân viên nghiên cứu của Nevo. Mình muốn hiểu cách bạn chọn đồ thể thao mùa hè, mất khoảng 10–15 phút. Câu trả lời chỉ dùng để nghiên cứu sản phẩm và được tổng hợp ẩn danh. Bạn đồng ý tham gia chứ?"));
+  const cb = el("input",{type:"checkbox",id:"m-consent"}); cb.checked=!!m.consent;
+  cb.addEventListener("change",()=>{m.consent=cb.checked; cb.closest(".card").classList.remove("miss"); saveDraft();});
+  meta.append(el("label",{class:"chk",for:"m-consent"},cb,"Khách đã đồng ý tham gia"));
+  const places = view==="offline"?PLACE_OFF:PLACE_ON;
+  const sel = el("select",{id:"m-place","aria-label":view==="offline"?"Loại địa điểm":"Kênh liên hệ"}, el("option",{value:"",text:view==="offline"?"Loại địa điểm…":"Kênh liên hệ…"}), ...places.map(p=>el("option",{value:p,text:p})));
+  sel.value=m.place||""; sel.addEventListener("change",()=>{m.place=sel.value;saveDraft();});
+  const pn = el("input",{type:"text",id:"m-placename",placeholder:view==="offline"?"Tên địa điểm (VD: Sân Pickleball Mỹ Đình)":"Ghi chú (VD: nhóm Zalo Runners Hải Phòng)"}); pn.value=m.placeName||"";
+  pn.addEventListener("input",()=>{m.placeName=pn.value;saveDraft();});
+  const iv = el("input",{type:"text",id:"m-interviewer",placeholder:"Tên người phỏng vấn *"}); iv.value=m.interviewer||"";
+  iv.addEventListener("input",()=>{m.interviewer=iv.value; iv.closest(".card").classList.remove("miss"); saveDraft();});
+  meta.append(iv);
+  meta.append(el("div",{class:"row2"},sel,pn));
+  body.append(meta);
+
+  let cur="";
+  for(const q of Q){
+    if(q.sub) continue;
+    if(q.s!==cur){ cur=q.s; body.append(el("div",{class:"sec-title"},el("h2",{text:SECTIONS[cur]}))); }
+    const card = buildQ(q,a);
+    body.append(card);
+    if(q.note2){ const sq=QMAP[q.note2]; const ta=el("textarea",{id:"q-"+sq.id,placeholder:"Ghi nguyên văn lời khách…",rows:2}); ta.value=a[sq.id]||""; ta.addEventListener("input",()=>{a[sq.id]=ta.value;saveDraft();}); card.append(ta); }
+  }
+  // contact
+  const ct = el("div",{class:"card"});
+  ct.append(el("div",{class:"q-label"},el("span",{class:"q-id",text:"✓"}),"Kết thúc"));
+  ct.append(el("div",{class:"hint"},el("b",{text:"Đọc cho khách"}),"Cảm ơn bạn đã tham gia. Nếu bạn đồng ý để Nevo liên hệ mời phỏng vấn sâu hoặc gửi quà cảm ơn, bạn để lại số điện thoại nhé (không bắt buộc)."));
+  const cok = el("input",{type:"checkbox",id:"m-contact"}); cok.checked=!!m.contactOk;
+  const ph = el("input",{type:"tel",id:"m-phone",placeholder:"Số điện thoại",inputmode:"tel",autocomplete:"off"}); ph.value=m.phone||""; ph.hidden=!m.contactOk;
+  cok.addEventListener("change",()=>{m.contactOk=cok.checked; ph.hidden=!cok.checked; if(!cok.checked){ph.value="";m.phone="";} saveDraft();});
+  ph.addEventListener("input",()=>{m.phone=ph.value;saveDraft();});
+  ct.append(el("label",{class:"chk",for:"m-contact"},cok,"Khách đồng ý để Nevo dùng số điện thoại này chỉ để liên hệ mời phỏng vấn sâu hoặc gửi quà"),ph);
+  ct.append(el("div",{class:"q-note",text:"Số điện thoại lưu tách riêng khỏi câu trả lời, không hiện trong bảng tổng hợp và file CSV."}));
+  body.append(ct);
+  applyVisibility();
+  renderStatus();
+}
+
+function buildQ(q,a){
+  const card = el("div",{class:"card",id:"card-"+q.id,"data-q":q.id});
+  card.append(el("div",{class:"q-label"},el("span",{class:"q-id",text:q.id}),el("span",null,q.l,q.req?el("span",{class:"req",text:" *"}):null,q.note?el("span",{class:"q-note",text:" · "+q.note}):null)));
+  const hint = view==="offline"?q.hOff:q.hOn;
+  if(hint) card.append(el("div",{class:"hint"},el("b",{text:view==="offline"?"Hỏi sâu":"Lưu ý"}),hint));
+  const box = el("div",{class:"q-body"}); card.append(box);
+  fillQ(q,a,box);
+  return card;
+}
+
+function fillQ(q,a,box){
+  box.replaceChildren();
+  const touch=()=>{ document.getElementById("card-"+q.id)?.classList.remove("miss"); saveDraft(); };
+  if(q.t==="single"||q.t==="multi"){
+    let opts = q.o;
+    if(q.dyn){ const src=a[q.dyn]||[]; opts = src.filter(x=>x!=="__other"); if(src.includes("__other")&&a[q.dyn+"__other"]) opts=opts.concat(["Khác: "+a[q.dyn+"__other"]]); if(!opts.length){ box.append(el("div",{class:"q-note",text:"Chọn ít nhất một dịp ở C1 trước."})); return; } if(a[q.id]&&!opts.includes(a[q.id])) delete a[q.id]; }
+    const wrap = el("div",{class:"opts",role:q.t==="single"?"radiogroup":"group"});
+    const all = opts.concat(q.other?["__other"]:[]);
+    const otherIn = q.other? el("input",{type:"text",placeholder:"Ghi rõ…",id:"q-"+q.id+"-other"}) : null;
+    const btns=[];
+    const sync=()=>{ const v=a[q.id]; btns.forEach(b=>{ const val=b.dataset.v; const on = q.t==="single"? v===val : Array.isArray(v)&&v.includes(val); b.setAttribute("aria-pressed",on?"true":"false"); if(q.t==="multi"&&q.max){ b.disabled = !on && Array.isArray(v) && v.length>=q.max; } }); if(otherIn){ const on = q.t==="single"? v==="__other" : Array.isArray(v)&&v.includes("__other"); otherIn.hidden=!on; } };
+    for(const o of all){
+      const b = el("button",{type:"button",class:"opt","data-v":o,text:o==="__other"?"Khác":o});
+      b.addEventListener("click",()=>{
+        if(q.t==="single"){ a[q.id] = a[q.id]===o? undefined : o; if(a[q.id]===undefined) delete a[q.id]; }
+        else { const arr = Array.isArray(a[q.id])?a[q.id].slice():[]; const i=arr.indexOf(o); if(i>=0) arr.splice(i,1); else { if(q.max&&arr.length>=q.max) return; arr.push(o);} a[q.id]=arr; if(!arr.length) delete a[q.id]; }
+        sync(); touch(); onChange(q.id);
+      });
+      btns.push(b); wrap.append(b);
+    }
+    box.append(wrap);
+    if(otherIn){ otherIn.value=a[q.id+"__other"]||""; otherIn.addEventListener("input",()=>{a[q.id+"__other"]=otherIn.value; touch(); if(q.id==="C1") onChange("C1");}); box.append(otherIn); }
+    sync();
+  } else if(q.t==="text"){
+    const ta = el("textarea",{id:"q-"+q.id,placeholder:view==="offline"?"Ghi nguyên văn lời khách…":"Nhập câu trả lời của khách…"});
+    ta.value=a[q.id]||""; ta.addEventListener("input",()=>{a[q.id]=ta.value; touch();});
+    box.append(ta);
+  } else if(q.t==="province"){
+    const s = el("select",{id:"q-A4","aria-label":"Tỉnh, thành"}, el("option",{value:"",text:"Chọn tỉnh, thành…"}),
+      el("optgroup",{label:"Đô thị cấp 1"},...C1.map(p=>el("option",{value:p,text:p}))),
+      el("optgroup",{label:"Đô thị cấp 2 (trung tâm tỉnh)"},...C2.map(p=>el("option",{value:p,text:p}))));
+    s.value=a.A4||""; const tg=el("span",{class:"pill"}); const upd=()=>{ const t=tier(s.value); tg.textContent=t||"Chưa chọn"; tg.className="pill"+(t?" ok":""); };
+    s.addEventListener("change",()=>{ if(s.value) a.A4=s.value; else delete a.A4; upd(); touch(); }); upd();
+    box.append(el("div",{class:"row2"},s,el("div",{style:"display:flex;align-items:center;gap:8px"},el("span",{class:"q-note",text:"Phân loại:"}),tg)));
+  } else if(q.t==="grid"){
+    const v = a[q.id]||{};
+    const t = el("table",{class:"grid-q"});
+    t.append(el("thead",null,el("tr",null,el("th",{text:"Món"}),...q.cols.map(c=>el("th",{class:"c",text:c})))));
+    const tb=el("tbody");
+    q.rows.forEach(r=>{ const tr=el("tr",null,el("td",{text:r})); q.cols.forEach(c=>{ const b=el("button",{type:"button",class:"opt","aria-label":r+": "+c,"aria-pressed":v[r]===c?"true":"false"}); b.addEventListener("click",()=>{ const cur=a[q.id]||{}; if(cur[r]===c) delete cur[r]; else cur[r]=c; a[q.id]=cur; if(!Object.keys(cur).length) delete a[q.id]; fillQ(q,a,box); touch(); }); tr.append(el("td",{class:"c"},b)); }); tb.append(tr); });
+    t.append(tb); box.append(el("div",{class:"scroll"},t));
+  } else if(q.t==="group"){
+    const v=a[q.id]||{};
+    q.parts.forEach(([k,lab,opts])=>{
+      const w=el("div",{class:"opts"});
+      opts.forEach(o=>{ const b=el("button",{type:"button",class:"opt",text:o,"aria-pressed":v[k]===o?"true":"false"}); b.addEventListener("click",()=>{ const cur=a[q.id]||{}; if(cur[k]===o) delete cur[k]; else cur[k]=o; a[q.id]=cur; if(!Object.keys(cur).length) delete a[q.id]; fillQ(q,a,box); touch(); }); w.append(b); });
+      box.append(el("div",{class:"q-note",text:lab}),w);
+    });
+  } else if(q.t==="rank"){
+    const v=a[q.id]||{};
+    const used = Object.values(v);
+    box.append(el("div",{class:"q-note",text:"Chạm số 1, 2, 3 cạnh lý do. Chạm lại để bỏ."}));
+    const list=el("div",{class:"rank"});
+    q.o.forEach(o=>{ const btns=el("div",{class:"rank-btns"}); [1,2,3].forEach(n=>{ const on=v[o]===n; const b=el("button",{type:"button",class:"opt",text:String(n),"aria-label":o+" hạng "+n,"aria-pressed":on?"true":"false"}); if(!on && used.includes(n)) b.disabled=true; b.addEventListener("click",()=>{ const cur=Object.assign({},a[q.id]||{}); if(cur[o]===n) delete cur[o]; else { for(const k in cur) if(cur[k]===n) delete cur[k]; cur[o]=n; } a[q.id]=cur; if(!Object.keys(cur).length) delete a[q.id]; fillQ(q,a,box); touch(); }); btns.append(b); }); list.append(el("div",{class:"rank-row"},el("span",{text:o}),btns)); });
+    box.append(list);
+  }
+}
+
+function onChange(id){
+  const a=store[view].a;
+  if(id==="B1") applyVisibility();
+  if(id==="C1"){ const q=QMAP.C2; const card=document.getElementById("card-C2"); if(card) fillQ(q,a,card.querySelector(".q-body")); }
+  renderStatus();
+}
+function applyVisibility(){ const a=store[view].a; for(const q of Q){ const c=document.getElementById("card-"+q.id); if(c) c.hidden=!visible(q,a); } }
+function renderStatus(){
+  const s=$("#f-status"); if(!s) return; s.replaceChildren();
+  const mine = responses.filter(r=>r.kenh===view && myId && r.by===myId).length;
+  const total = responses.filter(r=>r.kenh===view).length;
+  if(db){ s.append(el("span",{class:"pill red",text:`Kênh ${view} trên máy này: ${total}/25 phiếu`})); if(myId) s.append(el("span",{class:"pill",text:`Máy này đã nhập ${mine} phiếu`})); }
+  else s.append(el("span",{class:"pill warn",text:"Trình duyệt này không lưu được dữ liệu (đang ở chế độ ẩn danh hoặc chặn lưu trữ)."}));
+}
+
+async function submit(){
+  const st=store[view], a=st.a, m=st.m, msg=$("#f-msg");
+  document.querySelectorAll(".miss").forEach(x=>x.classList.remove("miss"));
+  const missing=[];
+  if(!m.consent||!(m.interviewer||"").trim()) missing.push(document.querySelector(".card.meta"));
+  for(const q of Q){ if(q.req && visible(q,a) && !a[q.id]) missing.push(document.getElementById("card-"+q.id)); }
+  if(missing.length){ missing.forEach(x=>x&&x.classList.add("miss")); msg.className="msg err"; msg.textContent= !m.consent?"Cần tích ô khách đồng ý tham gia.":!(m.interviewer||"").trim()?"Cần ghi tên người phỏng vấn.":"Còn thiếu câu bắt buộc (viền đỏ)."; missing[0]&&missing[0].scrollIntoView({behavior:"smooth",block:"center"}); return; }
+  let phone=""; if(m.contactOk){ phone=(m.phone||"").replace(/[^\d+]/g,""); if(!/^(\+?84|0)\d{8,10}$/.test(phone)){ msg.className="msg err"; msg.textContent="Số điện thoại chưa đúng. Kiểm tra lại hoặc bỏ tích ô đồng ý liên hệ."; return; } }
+  if(!db){ msg.className="msg err"; msg.textContent="Chưa lưu được: trang chưa kết nối nơi lưu dữ liệu."; return; }
+  const ans={}; for(const q of Q){ if(!visible(q,a)) continue; if(a[q.id]!==undefined && a[q.id]!=="") ans[q.id]=a[q.id]; if(a[q.id+"__other"]&&((q.t==="single"&&a[q.id]==="__other")||(Array.isArray(a[q.id])&&a[q.id].includes("__other")))) ans[q.id+"__other"]=a[q.id+"__other"]; }
+  const doc={kenh:view,createdAt:new Date().toISOString(),by:myId||null,interviewer:(m.interviewer||"").trim().slice(0,80),place:m.place||"",placeName:(m.placeName||"").slice(0,200),tier:tier(a.A4),ans,hasContact:!!phone};
+  const btn=$("#btn-submit"); btn.disabled=true; msg.className="msg"; msg.textContent="Đang lưu…";
+  try{
+    const ref=db.collection("responses").doc();
+    await ref.set(doc);
+    if(phone){ try{ await db.collection("contacts").doc(ref.id).set({phone,responseId:ref.id,kenh:view,createdAt:doc.createdAt}); }catch(e){} }
+    const keep={place:m.place,placeName:m.placeName,interviewer:m.interviewer};
+    store[view]=blank(); Object.assign(store[view].m,keep); saveDraft();
+    renderForm(); window.scrollTo({top:0,behavior:"smooth"});
+    $("#f-msg").className="msg ok"; $("#f-msg").textContent="Đã lưu phiếu. Sẵn sàng phỏng vấn khách tiếp theo."; toast("Đã lưu phiếu");
+  }catch(e){
+    msg.className="msg err";
+    msg.textContent = e&&e.code==="invalid_argument" ? "Bạn chưa có quyền ghi dữ liệu. Nhờ người quản lý chia sẻ trang với quyền Contributor (Người đóng góp)." : e&&e.code==="quota_exceeded" ? "Bộ nhớ dữ liệu đã đầy, báo người quản lý." : "Chưa lưu được, thử lại sau vài giây.";
+  }finally{ btn.disabled=false; }
+}
+
+/* ---------- SUMMARY ---------- */
+function filtered(){ const mon=$("#flt-mon").value, k=$("#flt-kenh").value; return responses.filter(r=>(!mon||r.ans?.A6===mon)&&(!k||r.kenh===k)); }
+function bars(rows,base,sort=true){ const box=el("div",{class:"bars"}); const list=sort?rows.slice().sort((x,y)=>y[1]-x[1]):rows; const max=Math.max(1,...list.map(r=>r[1]));
+  list.forEach(([lab,n])=>{ const pct=base?Math.round(n*100/base):0; box.append(el("div",{class:"b"},el("div",{class:"t"},el("div",{text:lab,title:lab}),el("div",{class:"track"},el("i",{style:`width:${(n/max)*100}%`}))),el("div",{class:"n"},String(n)," ",el("small",{text:`${pct}%`})))); });
+  return box; }
+function resCard(q,content,base,wide){ const c=el("div",{class:"card"+(wide?" wide":"")}); c.append(el("div",{class:"q-label"},el("span",{class:"q-id",text:q.id}),el("span",{text:q.l}))); c.append(el("div",{class:"dec"},...q.d.map(d=>el("span",{text:DEC[d]})))); c.append(content); if(base!==undefined) c.append(el("div",{class:"base",text:`Số người trả lời: ${base}`})); return c; }
+
+function renderSummary(){
+  const body=$("#sum-body"); body.replaceChildren();
+  if(!db){ body.append(el("div",{class:"empty",text:"Trang chưa kết nối nơi lưu dữ liệu. Mở trên claude.ai khi đã đăng nhập tài khoản YODY để xem tổng hợp."})); return; }
+  const all=responses, R=filtered(), dec=$("#flt-dec").value;
+  // KPIs + quota
+  const cnt=f=>all.filter(f).length;
+  const kp=[["Tổng phiếu",all.length,50],["Online",cnt(r=>r.kenh==="online"),25],["Offline",cnt(r=>r.kenh==="offline"),25],["Nam",cnt(r=>r.ans?.A1==="Nam"),25],["Nữ",cnt(r=>r.ans?.A1==="Nữ"),25],["20–24 tuổi",cnt(r=>["20–22","23–24"].includes(r.ans?.A2)),25],["25–30 tuổi",cnt(r=>["25–27","28–30"].includes(r.ans?.A2)),25],["Đô thị cấp 1",cnt(r=>r.tier==="Cấp 1"),30],["Đô thị cấp 2",cnt(r=>r.tier==="Cấp 2"),20]];
+  const kg=el("div",{class:"kpis"});
+  kp.forEach(([k,v,t])=>kg.append(el("div",{class:"kpi"},el("div",{class:"k",text:k+" · chỉ tiêu "+t}),el("div",{class:"v"},String(v),el("small",{text:" /"+t})),el("div",{class:"prog"},el("i",{style:`width:${Math.min(100,v*100/t)}%`})))));
+  body.append(kg);
+  const sp=el("div",{class:"status",style:"margin-top:10px"});
+  ["Chạy bộ","Pickleball","Cả hai"].forEach(x=>sp.append(el("span",{class:"pill",text:`${x}: ${cnt(r=>r.ans?.A6===x)}`})));
+  sp.append(el("span",{class:"pill red",text:`Đang xem: ${R.length} phiếu theo bộ lọc`}));
+  body.append(sp);
+  if(!all.length){ body.append(el("div",{class:"empty",text:"Chưa có phiếu nào. Phiếu đầu tiên lưu ở tab Phỏng vấn offline hoặc online sẽ hiện ngay tại đây."})); return; }
+
+  const grid=el("div",{class:"res-grid"}); body.append(grid);
+  for(const q of Q){
+    if(dec && !q.d.includes(dec)) continue;
+    const has=R.filter(r=>r.ans&&r.ans[q.id]!==undefined); const base=has.length;
+    if(q.t==="single"||q.t==="multi"){
+      const m=new Map(); (q.dyn?C1_OPTS:q.o||[]).forEach(o=>m.set(o,0));
+      has.forEach(r=>{ const v=r.ans[q.id]; (Array.isArray(v)?v:[v]).forEach(x=>{ let lab=x==="__other"?"Khác":(x.startsWith&&x.startsWith("Khác: ")?"Khác":x); m.set(lab,(m.get(lab)||0)+1); }); });
+      const rows=[...m.entries()].filter(([k,n])=>n>0||!q.dyn);
+      const content=el("div",{style:"display:flex;flex-direction:column;gap:8px"},bars(rows,base,q.t==="multi"||q.id==="C2"));
+      if(q.other){ const others=has.map(r=>r.ans[q.id+"__other"]).filter(Boolean); if(others.length) content.append(el("div",{class:"q-note",text:"Khác: "+others.join(" · ")})); }
+      grid.append(resCard(q,content,base,false));
+    } else if(q.t==="province"){
+      const m=new Map(); has.forEach(r=>m.set(r.ans.A4,(m.get(r.ans.A4)||0)+1));
+      grid.append(resCard(q,bars([...m.entries()],base),base));
+    } else if(q.t==="group"){
+      const content=el("div",{style:"display:flex;flex-direction:column;gap:10px"});
+      q.parts.forEach(([k,lab,opts])=>{ const m=new Map(opts.map(o=>[o,0])); let b=0; has.forEach(r=>{ const v=r.ans[q.id]?.[k]; if(v){ b++; m.set(v,(m.get(v)||0)+1);} }); content.append(el("div",{class:"q-note",text:lab}),bars([...m.entries()],b)); });
+      grid.append(resCard(q,content,base));
+    } else if(q.t==="grid"){
+      const t=el("table"); t.append(el("thead",null,el("tr",null,el("th",{text:"Món"}),...q.cols.map(c=>el("th",{class:"c",text:c})),el("th",{class:"c",text:"n"}))));
+      const tb=el("tbody"); q.rows.forEach(rw=>{ const counts=q.cols.map(c=>has.filter(r=>r.ans[q.id]?.[rw]===c).length); const n=counts.reduce((x,y)=>x+y,0); const mx=Math.max(...counts); tb.append(el("tr",null,el("td",{text:rw}),...counts.map(v=>el("td",{class:"c"+(v&&v===mx?" hl":""),text:v?String(v):"·"})),el("td",{class:"c",text:String(n)}))); });
+      t.append(tb); const c=el("div",null,el("div",{class:"scroll"},t),el("div",{class:"q-note",text:"Ô tô đậm là mức giá được chọn nhiều nhất cho từng món."}));
+      grid.append(resCard(q,c,base,true));
+    } else if(q.t==="rank"){
+      const rows=q.o.map(o=>{ let sc=0,h1=0; has.forEach(r=>{ const v=r.ans[q.id]?.[o]; if(v){ sc+=4-v; if(v===1) h1++; } }); return [o,sc,h1]; }).sort((x,y)=>y[1]-x[1]);
+      const box=el("div",{class:"bars"}); const max=Math.max(1,...rows.map(r=>r[1]));
+      rows.forEach(([o,sc,h1])=>box.append(el("div",{class:"b"},el("div",{class:"t"},el("div",{text:o,title:o}),el("div",{class:"track"},el("i",{style:`width:${sc/max*100}%`}))),el("div",{class:"n"},String(sc)," ",el("small",{text:`H1: ${h1}`})))));
+      grid.append(resCard(q,el("div",null,box,el("div",{class:"q-note",text:"Điểm = hạng 1 được 3 điểm, hạng 2 được 2, hạng 3 được 1. H1 = số người xếp hạng 1."})),base,true));
+    } else if(q.t==="text"){
+      const qs=el("div",{class:"quotes"});
+      has.filter(r=>String(r.ans[q.id]).trim()).forEach(r=>{ const who=[r.ans.A6,r.ans.A1,r.ans.A2,r.ans.A4,r.kenh].filter(Boolean).join(" · "); qs.append(el("div",{class:"quote"},el("div",{text:"“"+r.ans[q.id]+"”"}),el("div",{class:"who",text:who}))); });
+      if(!qs.childElementCount) qs.append(el("div",{class:"q-note",text:"Chưa có câu trả lời."}));
+      grid.append(resCard(q,qs,base,true));
+    }
+  }
+  // response list
+  const lc=el("div",{class:"card wide"}); lc.append(el("div",{class:"q-label"},el("span",{class:"q-id",text:"#"}),"Danh sách phiếu"));
+  const t=el("table"); t.append(el("thead",null,el("tr",null,...["Thời gian","Kênh","Người phỏng vấn","Địa điểm / kênh","Giới tính","Tuổi","Môn","Tỉnh, thành",""].map(h=>el("th",{text:h})))));
+  const tb=el("tbody");
+  R.slice().sort((x,y)=>String(y.createdAt).localeCompare(String(x.createdAt))).forEach(r=>{
+    const name = r.interviewer || "—";
+    const del = isEditor? el("button",{type:"button",class:"btn small danger",text:"Xóa"}) : null;
+    if(del){ del.addEventListener("click",async()=>{ if(del.dataset.arm!=="1"){ del.dataset.arm="1"; del.textContent="Bấm lần nữa để xóa"; setTimeout(()=>{del.dataset.arm="";del.textContent="Xóa";},4000); return; } del.disabled=true; try{ await db.collection("responses").doc(r.id).delete(); try{ await db.collection("contacts").doc(r.id).delete(); }catch(e){} toast("Đã xóa phiếu"); }catch(e){ toast("Chưa xóa được"); del.disabled=false; } }); }
+    tb.append(el("tr",null,el("td",{text:fmtTime(r.createdAt)}),el("td",{text:r.kenh}),el("td",{text:name}),el("td",{text:[r.place,r.placeName].filter(Boolean).join(" · ")}),el("td",{text:r.ans?.A1||""}),el("td",{text:r.ans?.A2||""}),el("td",{text:r.ans?.A6||""}),el("td",{text:r.ans?.A4||""}),el("td",null,del)));
+  });
+  t.append(tb); lc.append(el("div",{class:"scroll"},t)); grid.append(lc);
+}
+
+function cell(v){ if(v===undefined||v===null) return ""; let s; if(Array.isArray(v)) s=v.map(x=>x==="__other"?"Khác":x).join("; "); else if(typeof v==="object") s=Object.entries(v).map(([k,x])=>k+": "+x).join("; "); else s=v==="__other"?"Khác":String(v); return '"'+s.replace(/"/g,'""').replace(/\r?\n/g," ")+'"'; }
+async function exportCSV(){
+  if(!dl){ toast("Trình xem này chưa hỗ trợ tải file"); return; }
+  const cols=[]; Q.forEach(q=>{ if(q.t==="group") q.parts.forEach(([k,lab])=>cols.push([q.id+"_"+k,q.id+" "+lab,r=>r.ans?.[q.id]?.[k]])); else if(q.t==="grid") q.rows.forEach(rw=>cols.push([q.id,q.id+" "+rw,r=>r.ans?.[q.id]?.[rw]])); else if(q.t==="rank") [1,2,3].forEach(n=>cols.push([q.id,q.id+" hạng "+n,r=>{const v=r.ans?.[q.id]||{}; return Object.keys(v).find(k=>v[k]===n);}])); else { cols.push([q.id,q.id+" "+q.l,r=>r.ans?.[q.id]]); if(q.other) cols.push([q.id,q.id+" khác",r=>r.ans?.[q.id+"__other"]]); } });
+  const head=["Mã phiếu","Thời gian","Kênh","Người phỏng vấn","Địa điểm / kênh liên hệ","Tên địa điểm / ghi chú","Phân loại đô thị"].concat(cols.map(c=>c[1]));
+  const lines=[head.map(h=>cell(h)).join(",")];
+  filtered().forEach(r=>{ lines.push([r.id,fmtTime(r.createdAt),r.kenh,r.interviewer||"",r.place,r.placeName,r.tier].map(cell).concat(cols.map(c=>cell(c[2](r)))).join(",")); });
+  try{ await dl.save({filename:"nevo-khao-sat-he-2027.csv",data:"﻿"+lines.join("\r\n")}); }catch(e){ if(e&&e.code!=="declined") toast("Chưa tải được file"); }
+}
+async function exportContacts(){
+  if(!dl||!db) return;
+  try{ const snap=await db.collection("contacts").get(); const lines=['"Mã phiếu","Số điện thoại","Kênh","Thời gian"']; snap.docs.forEach(d=>{ const x=d.data(); lines.push([x.responseId,x.phone,x.kenh,fmtTime(x.createdAt)].map(cell).join(",")); }); await dl.save({filename:"nevo-khao-sat-lien-he.csv",data:"﻿"+lines.join("\r\n")}); }catch(e){ if(e&&e.code!=="declined") toast("Chưa tải được danh sách"); }
+}
+
+/* ---------- VIEW SWITCH ---------- */
+function setView(v){
+  if(!["offline","online","tonghop"].includes(v)) v="offline";
+  view = v==="tonghop" ? view : v;
+  document.querySelectorAll("nav a").forEach(a=>a.setAttribute("aria-current",a.dataset.view===v?"page":"false"));
+  $("#view-form").hidden = v==="tonghop"; $("#view-sum").hidden = v!=="tonghop";
+  if(v==="tonghop") renderSummary(); else { $("#f-msg").textContent=""; renderForm(); }
+  current=v;
+}
+let current="offline";
+document.querySelectorAll("nav a").forEach(a=>a.addEventListener("click",e=>{ e.preventDefault(); try{history.replaceState(null,"","#"+a.dataset.view);}catch(_){} setView(a.dataset.view); window.scrollTo({top:0}); }));
+window.addEventListener("hashchange",()=>setView(location.hash.slice(1)));
+$("#btn-submit").addEventListener("click",submit);
+$("#btn-clear").addEventListener("click",function(){ const b=this; if(b.dataset.arm!=="1"){ b.dataset.arm="1"; b.textContent="Bấm lần nữa để xóa"; setTimeout(()=>{b.dataset.arm="";b.textContent="Xóa nội dung đang nhập";},4000); return; } b.dataset.arm=""; b.textContent="Xóa nội dung đang nhập"; const keep=store[view].m; store[view]=blank(); store[view].m.place=keep.place; store[view].m.placeName=keep.placeName; store[view].m.interviewer=keep.interviewer; saveDraft(); renderForm(); });
+["#flt-mon","#flt-kenh","#flt-dec"].forEach(s=>$(s).addEventListener("change",renderSummary));
+$("#btn-csv").addEventListener("click",exportCSV);
+$("#btn-contacts").addEventListener("click",exportContacts);
+
+setView((location.hash||"").slice(1)||"offline");
+
+/* ---------- LƯU TRÊN MÁY ---------- */
+const LS_DATA="nevo-ks-data";
+function loadAll(){ try{ const o=JSON.parse(localStorage.getItem(LS_DATA)||"{}"); return {responses:o.responses||{},contacts:o.contacts||{}}; }catch(e){ return {responses:{},contacts:{}}; } }
+function saveAll(o){ localStorage.setItem(LS_DATA,JSON.stringify(o)); }
+const listeners=[];
+function snap(){ const all=loadAll(); return {docs:Object.keys(all.responses).map(id=>({id,data:()=>all.responses[id]}))}; }
+function emit(){ const sn=snap(); listeners.forEach(f=>f(sn)); }
+const localDb={collection(name){ return {
+  doc(id){ id=id||("p"+Date.now().toString(36)+Math.random().toString(36).slice(2,7)); return {id,
+    async set(d){ const all=loadAll(); all[name][id]=d; saveAll(all); emit(); },
+    async delete(){ const all=loadAll(); delete all[name][id]; saveAll(all); emit(); } }; },
+  onSnapshot(f){ if(name==="responses"){ listeners.push(f); setTimeout(()=>f(snap()),0); } return ()=>{}; },
+  async get(){ const all=loadAll(); return {docs:Object.keys(all[name]).map(id=>({id,data:()=>all[name][id]}))}; } }; }};
+function saveFile(filename,data,type){ const blob=new Blob([data],{type}); const url=URL.createObjectURL(blob); const a=document.createElement("a"); a.href=url; a.download=filename; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),2000); }
+(function(){
+  try{ localStorage.setItem("nevo-ks-test","1"); localStorage.removeItem("nevo-ks-test"); db=localDb; }catch(e){ db=null; }
+  dl={save:async({filename,data})=>{ saveFile(filename,data,filename.endsWith(".json")?"application/json":"text/csv;charset=utf-8"); return {status:"saved"}; }};
+  try{ myId=localStorage.getItem("nevo-ks-device"); if(!myId){ myId="m"+Math.random().toString(36).slice(2,10); localStorage.setItem("nevo-ks-device",myId); } }catch(e){}
+  isEditor=true; $("#btn-contacts").hidden=false;
+  window.addEventListener("storage",e=>{ if(e.key===LS_DATA) emit(); });
+  $("#btn-json").addEventListener("click",()=>{ const d=new Date(); const p=n=>String(n).padStart(2,"0"); saveFile("nevo-du-lieu-"+p(d.getDate())+"-"+p(d.getMonth()+1)+"-"+d.getFullYear()+".json",JSON.stringify(Object.assign({nguon:"nevo-khao-sat-he-2027"},loadAll())),"application/json"); });
+  $("#f-import").addEventListener("change",async ev=>{ const f=ev.target.files[0]; if(!f) return; try{ const o=JSON.parse(await f.text()); if(!o.responses) throw 0; const all=loadAll(); let n=0; for(const k in o.responses){ if(!all.responses[k]) n++; all.responses[k]=o.responses[k]; } Object.assign(all.contacts,o.contacts||{}); saveAll(all); emit(); toast("Đã gộp "+n+" phiếu mới"); }catch(e){ toast("File không đúng định dạng dữ liệu khảo sát"); } ev.target.value=""; });
+  if(db){ subscribed=true; db.collection("responses").onSnapshot(sn=>{ responses=sn.docs.map(d=>Object.assign({id:d.id},d.data())); renderStatus(); if(current==="tonghop") renderSummary(); }); }
+  renderStatus(); if(current==="tonghop") renderSummary();
+})();
+})();
+</script>
+</body>
+</html>
