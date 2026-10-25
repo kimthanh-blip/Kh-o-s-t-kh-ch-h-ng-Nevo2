@@ -1,1 +1,0 @@
-# Kh-o-s-t-kh-ch-h-ng-Nevo2
